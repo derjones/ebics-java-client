@@ -171,11 +171,11 @@ public class FileTransfer {
    * @throws EbicsException server generated error
    */
   public void fetchFile(EbicsOrderType orderType,
-                        File outputFile)
+                        File outputFile,EbicsUploadParams params)
     throws IOException, EbicsException
   {
     var sender = new HttpRequestSender(session);
-      var initializer = new DownloadInitializationRequestElement(session, orderType);
+      var initializer = new DownloadInitializationRequestElement(session, orderType, params);
     initializer.build();
     initializer.validate();
 

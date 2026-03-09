@@ -15,7 +15,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  */
-
 package org.kopi.ebics.xml;
 
 import java.util.Calendar;
@@ -33,7 +32,7 @@ import org.ebics.s002.SignaturePubKeyOrderDataType;
 import org.ebics.s002.UserSignatureDataDocument;
 import org.ebics.s002.UserSignatureDataSigBookType;
 import org.kopi.ebics.schema.h005.AuthenticationPubKeyInfoType;
-import org.kopi.ebics.schema.h005.BTUOrderParamsDocument;
+import org.kopi.ebics.schema.h005.BTDParamsType;
 import org.kopi.ebics.schema.h005.BTUParamsType;
 import org.kopi.ebics.schema.h005.DataDigestType;
 import org.kopi.ebics.schema.h005.DataEncryptionInfoType.EncryptionPubKeyDigest;
@@ -63,8 +62,6 @@ import org.kopi.ebics.schema.h005.ParameterDocument.Parameter;
 import org.kopi.ebics.schema.h005.ParameterDocument.Parameter.Value;
 import org.kopi.ebics.schema.h005.ProductElementType;
 import org.kopi.ebics.schema.h005.PubKeyInfoType;
-import org.kopi.ebics.schema.h005.SignatureFlagType;
-import org.kopi.ebics.schema.h005.StandardOrderParamsDocument;
 import org.kopi.ebics.schema.h005.StandardOrderParamsType;
 import org.kopi.ebics.schema.h005.StaticHeaderOrderDetailsType;
 import org.kopi.ebics.schema.h005.StaticHeaderType;
@@ -899,7 +896,7 @@ public final class EbicsXmlFactory {
     }
 
     public static BTUParamsType createBTUParams(String serviceName, String scope, String option,
-        String messageName, String messageVersion, boolean signatureFlag) {
+            String messageName, String messageVersion, boolean signatureFlag) {
         var type = BTUParamsType.Factory.newInstance();
         var service = type.addNewService();
         service.setServiceName(serviceName);
@@ -911,7 +908,34 @@ public final class EbicsXmlFactory {
 
         msgType.setStringValue(messageName);
         //msgType.setFormat(messageName);
-        msgType.setVersion(messageVersion);
+        if (messageVersion != null) {
+            msgType.setVersion(messageVersion);
+        }
+        service.setMsgName(msgType);
+        if (signatureFlag) {
+            var flag = type.addNewSignatureFlag();
+            flag.setRequestEDS(true);
+        }
+        return type;
+    }
+    public static BTDParamsType createBTDParams(String serviceName, String scope, String option,
+            String messageName, String messageVersion, boolean signatureFlag) {
+        var type = BTDParamsType.Factory.newInstance();
+        var service = type.addNewService();
+        service.setServiceName(serviceName);
+        var container = service.addNewContainer();
+        container.setContainerType(org.kopi.ebics.schema.h005.ContainerStringType.Enum.forString("ZIP"));
+        service.setScope(scope);
+        if (option != null) {
+            service.setServiceOption(option);
+        }
+        var msgType = MessageType.Factory.newInstance();
+
+        msgType.setStringValue(messageName);
+        //msgType.setFormat(messageName);
+        if (messageVersion != null) {
+            msgType.setVersion(messageVersion);
+        }
         service.setMsgName(msgType);
         if (signatureFlag) {
             var flag = type.addNewSignatureFlag();

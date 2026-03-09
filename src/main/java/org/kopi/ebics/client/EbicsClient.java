@@ -42,6 +42,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.xml.security.Init;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.kopi.ebics.client.EbicsUploadParams.OrderParams;
 import org.kopi.ebics.exception.EbicsException;
 import org.kopi.ebics.exception.NoDownloadDataAvailableException;
 import org.kopi.ebics.interfaces.Configuration;
@@ -429,8 +430,17 @@ public class EbicsClient {
         configuration.getTraceManager().setTraceDirectory(
             configuration.getTransferTraceDirectory(user));
 
+        EbicsUploadParams params = null;
+        if (orderType == OrderType.C53) {
+            var orderParams = new EbicsUploadParams.OrderParams("EOP", "DE", null, "camt.053",
+                    "03", false);
+            params = new EbicsUploadParams(null, orderParams);
+        } else {
+            throw new EbicsException("Message not implemented.");
+        }
+
         try {
-            transferManager.fetchFile(orderType, file);
+            transferManager.fetchFile(orderType, file, params);
         } catch (NoDownloadDataAvailableException e) {
             // don't log this exception as an error, caller can decide how to handle
             throw e;
@@ -512,10 +522,10 @@ public class EbicsClient {
         String userEmail = properties.get("user.email");
         String userCountry = properties.get("user.country");
         String userOrg = properties.get("user.org");
-        boolean useCertificates = false;
+        boolean useCertificates = true;
         boolean saveCertificates = true;
         return createUser(new URL(bankUrl), bankName, hostId, partnerId, userId, userName, userEmail,
-            userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
+                userCountry, userOrg, useCertificates, saveCertificates, pwdHandler);
     }
 
     private static CommandLine parseArguments(Options options, String[] args)
