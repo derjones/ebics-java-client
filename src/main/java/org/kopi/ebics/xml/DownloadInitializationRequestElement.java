@@ -28,7 +28,7 @@ import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Body;
 import org.kopi.ebics.schema.h005.EbicsRequestDocument.EbicsRequest.Header;
 import org.kopi.ebics.schema.h005.MutableHeaderType;
-import org.kopi.ebics.schema.h005.StandardOrderParamsType;
+import org.kopi.ebics.schema.h005.StandardOrderParamsDocument;
 import org.kopi.ebics.schema.h005.StaticHeaderOrderDetailsType;
 import org.kopi.ebics.schema.h005.StaticHeaderType;
 import org.kopi.ebics.schema.h005.StaticHeaderType.BankPubKeyDigests;
@@ -82,15 +82,15 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
                 decodeHex(session.getUser().getPartner().getBank().getE002Digest()));
         bankPubKeyDigests = EbicsXmlFactory.createBankPubKeyDigests(authentication, encryption);
 
-        var type = StaticHeaderOrderDetailsType.AdminOrderType.Factory.newInstance();
+                var adminOrderType = StaticHeaderOrderDetailsType.AdminOrderType.Factory.newInstance();
         if (this.uploadParams == null) {
-            type.setStringValue(this.getType());
+                        adminOrderType.setStringValue(this.getType());
         } else {
-            type.setStringValue("BTD");
+                        adminOrderType.setStringValue("BTD");
         }
 
         var orderParamsType = (XmlObject) EbicsXmlFactory.createStandardOrderParamsType();
-        var orderParamsSchema = StandardOrderParamsType.type;
+        var orderParamsSchema = StandardOrderParamsDocument.type;
 
         if (this.uploadParams != null && this.uploadParams.orderParams() != null) {
             var p = this.uploadParams.orderParams();
@@ -102,7 +102,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
         //FIXME Some banks cannot handle OrderID element in download process. Add parameter in configuration!!!
         orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(null,
                 // session.getUser().getPartner().nextOrderId(),
-                type,
+                adminOrderType,
                 orderParamsType,
                 orderParamsSchema);
 

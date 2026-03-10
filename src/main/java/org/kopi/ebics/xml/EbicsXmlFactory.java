@@ -891,7 +891,11 @@ public final class EbicsXmlFactory {
         }
         type.setAdminOrderType(orderType);
         type.setOrderParams(orderParams);
-        qualifySubstitutionGroup(type.getOrderParams(), orderParamsType.getDocumentElementName(), null);
+        QName orderParamsName = orderParamsType == null ? null : orderParamsType.getDocumentElementName();
+        if (orderParamsName == null) {
+            throw new IllegalArgumentException("OrderParams schema type must provide a document element name.");
+        }
+        qualifySubstitutionGroup(type.getOrderParams(), orderParamsName, null);
         return type;
     }
 
@@ -1350,6 +1354,10 @@ public final class EbicsXmlFactory {
         SchemaType newType) {
         XmlObject substitute;
 
+        if (newInstance == null) {
+            throw new IllegalArgumentException("Substitution group name must not be null.");
+        }
+
         if (newType != null) {
             substitute = xobj.substitute(newInstance, newType);
             if (substitute != null && substitute.schemaType() == newType && substitute.getDomNode()
@@ -1359,7 +1367,6 @@ public final class EbicsXmlFactory {
         }
 
         try (XmlCursor cursor = xobj.newCursor()) {
-            System.out.println(newInstance);
             cursor.setName(newInstance);
             QName qName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type");
             cursor.removeAttribute(qName);

@@ -32,7 +32,7 @@ import org.kopi.ebics.interfaces.ContentFactory;
 import org.kopi.ebics.interfaces.EbicsOrderType;
 import org.kopi.ebics.io.Splitter;
 import org.kopi.ebics.schema.h005.BTUOrderParamsDocument;
-import org.kopi.ebics.schema.h005.StandardOrderParamsType;
+import org.kopi.ebics.schema.h005.StandardOrderParamsDocument;
 import org.kopi.ebics.schema.h005.StaticHeaderOrderDetailsType;
 import org.kopi.ebics.session.EbicsSession;
 import org.kopi.ebics.utils.Utils;
@@ -87,11 +87,11 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
 
         String nextOrderId = uploadParams.orderId();
 
-        var type = StaticHeaderOrderDetailsType.AdminOrderType.Factory.newInstance();
-        type.setStringValue(this.getType());
+        var adminOrderType = StaticHeaderOrderDetailsType.AdminOrderType.Factory.newInstance();
+        adminOrderType.setStringValue(this.getType());
 
         var orderParamsType = (XmlObject) EbicsXmlFactory.createStandardOrderParamsType();
-        var orderParamsSchema = StandardOrderParamsType.type;
+        var orderParamsSchema = StandardOrderParamsDocument.type;
 
         if (uploadParams.orderParams() != null) {
             var p = uploadParams.orderParams();
@@ -101,7 +101,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
         }
 
         StaticHeaderOrderDetailsType orderDetails = EbicsXmlFactory.createStaticHeaderOrderDetailsType(
-            nextOrderId, type, orderParamsType,orderParamsSchema);
+            nextOrderId, adminOrderType, orderParamsType, orderParamsSchema);
 
         var xstatic = EbicsXmlFactory.createStaticHeaderType(session.getBankID(), nonce,
             splitter.getSegmentNumber(), session.getUser().getPartner().getPartnerId(), product,
