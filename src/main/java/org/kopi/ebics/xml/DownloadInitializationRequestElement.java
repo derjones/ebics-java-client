@@ -92,10 +92,10 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
         var orderParamsType = (XmlObject) EbicsXmlFactory.createStandardOrderParamsType();
         var orderParamsSchema = StandardOrderParamsType.type;
 
-        if (uploadParams.orderParams() != null) {
-            var p = uploadParams.orderParams();
+        if (this.uploadParams != null && this.uploadParams.orderParams() != null) {
+            var p = this.uploadParams.orderParams();
             orderParamsType = EbicsXmlFactory.createBTDParams(p.serviceName(), p.scope(),
-                    p.option(), p.messageName(), p.messageVersion(), p.signatureFlag());
+                    p.option(), p.messageName(), p.messageVersion(), p.signatureFlag(), p.containerType());
             orderParamsSchema = BTDOrderParamsDocument.type;
         }
 
@@ -127,6 +127,7 @@ public class DownloadInitializationRequestElement extends InitializationRequestE
     // --------------------------------------------------------------------
     // DATA MEMBERS
     // --------------------------------------------------------------------
+    // Upload and download params
     private final EbicsUploadParams uploadParams;
 
     private static final long serialVersionUID = 3776072549761880272L;

@@ -96,7 +96,7 @@ public class UploadInitializationRequestElement extends InitializationRequestEle
         if (uploadParams.orderParams() != null) {
             var p = uploadParams.orderParams();
             orderParamsType = EbicsXmlFactory.createBTUParams(p.serviceName(), p.scope(),
-                p.option(), p.messageName(), p.messageVersion(), p.signatureFlag());
+                p.option(), p.messageName(), p.messageVersion(), p.signatureFlag(), p.containerType());
             orderParamsSchema = BTUOrderParamsDocument.type;
         }
 

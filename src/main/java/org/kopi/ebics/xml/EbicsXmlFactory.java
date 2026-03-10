@@ -896,11 +896,15 @@ public final class EbicsXmlFactory {
     }
 
     public static BTUParamsType createBTUParams(String serviceName, String scope, String option,
-            String messageName, String messageVersion, boolean signatureFlag) {
+            String messageName, String messageVersion, boolean signatureFlag, String containerType) {
         var type = BTUParamsType.Factory.newInstance();
         var service = type.addNewService();
         service.setServiceName(serviceName);
         service.setScope(scope);
+        if (containerType != null) {
+            var container = service.addNewContainer();
+            container.setContainerType(org.kopi.ebics.schema.h005.ContainerStringType.Enum.forString(containerType));
+        }
         if (option != null) {
             service.setServiceOption(option);
         }
@@ -919,12 +923,14 @@ public final class EbicsXmlFactory {
         return type;
     }
     public static BTDParamsType createBTDParams(String serviceName, String scope, String option,
-            String messageName, String messageVersion, boolean signatureFlag) {
+            String messageName, String messageVersion, boolean signatureFlag, String containerType) {
         var type = BTDParamsType.Factory.newInstance();
         var service = type.addNewService();
         service.setServiceName(serviceName);
-        var container = service.addNewContainer();
-        container.setContainerType(org.kopi.ebics.schema.h005.ContainerStringType.Enum.forString("ZIP"));
+        if (containerType != null) {
+            var container = service.addNewContainer();
+            container.setContainerType(org.kopi.ebics.schema.h005.ContainerStringType.Enum.forString(containerType));
+        }
         service.setScope(scope);
         if (option != null) {
             service.setServiceOption(option);
@@ -1353,6 +1359,7 @@ public final class EbicsXmlFactory {
         }
 
         try (XmlCursor cursor = xobj.newCursor()) {
+            System.out.println(newInstance);
             cursor.setName(newInstance);
             QName qName = new QName("http://www.w3.org/2001/XMLSchema-instance", "type");
             cursor.removeAttribute(qName);

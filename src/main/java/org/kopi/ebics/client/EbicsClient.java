@@ -409,12 +409,17 @@ public class EbicsClient {
         EbicsUploadParams params;
         if (orderType == OrderType.XE2) {
             var orderParams = new EbicsUploadParams.OrderParams("MCT", "CH", null, "pain.001",
-                "03", true);
+                "03", true, null);
             params = new EbicsUploadParams(null, orderParams);
+            sendFile(file, defaultUser, defaultProduct, orderType, params);
+        } else if (orderType == OrderType.CDC) {
+            var orderParams = new EbicsUploadParams.OrderParams("SDD", "DE", "COR", "pain.008",
+                null, true, "XML");
+            params = new EbicsUploadParams(null, orderParams);
+            sendFile(file, defaultUser, defaultProduct, OrderType.BTU, params);
         } else {
-            params = new EbicsUploadParams(defaultUser.getPartner().nextOrderId(), null);
+            throw new EbicsException("Message not implemented.");
         }
-        sendFile(file, defaultUser, defaultProduct, orderType, params);
     }
 
     public void fetchFile(File file, User user, Product product, EbicsOrderType orderType,
@@ -433,9 +438,13 @@ public class EbicsClient {
         EbicsUploadParams params = null;
         if (orderType == OrderType.C53) {
             var orderParams = new EbicsUploadParams.OrderParams("EOP", "DE", null, "camt.053",
-                    "03", false);
+                    "03", false, "ZIP");
             params = new EbicsUploadParams(null, orderParams);
-        } else {
+        } else if (orderType == OrderType.HAC) {
+            // var orderParams = new EbicsUploadParams.OrderParams("HAC", "DE", null, "pain.002",
+            //        null, false, null);
+            //params = new EbicsUploadParams(null, orderParams);
+        }else {
             throw new EbicsException("Message not implemented.");
         }
 
@@ -627,6 +636,7 @@ public class EbicsClient {
 
         addOption(options, OrderType.XKD, "Send payment order file (DTA format)");
         addOption(options, OrderType.FUL, "Send payment order file (any format)");
+        addOption(options, OrderType.CDC, "Send CDC SEPA-Lastschrift (Basis, XML-Container)");
         addOption(options, OrderType.XCT, "Send XCT file (any format)");
         addOption(options, OrderType.XE2, "Send XE2 file (any format)");
         addOption(options, OrderType.CCT, "Send CCT file (any format)");
@@ -679,7 +689,7 @@ public class EbicsClient {
         }
 
         var sendFileOrders = List.of(OrderType.XKD, OrderType.FUL, OrderType.XCT,
-            OrderType.XE2, OrderType.CCT);
+            OrderType.XE2, OrderType.CCT, OrderType.CDC);
         for (EbicsOrderType type : sendFileOrders) {
             if (hasOption(cmd, type)) {
                 client.sendFile(new File(inputFileValue), type);
