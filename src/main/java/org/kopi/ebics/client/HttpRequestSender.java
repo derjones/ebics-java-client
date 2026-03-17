@@ -102,8 +102,9 @@ public class HttpRequestSender {
      * @return the HTTP return code
      */
     public final int send(ContentFactory request) throws IOException {
-        System.out.println("Request:");
-        System.out.println(request);
+        // DEBUG LOGS:
+        // System.out.println("Request:");
+        // System.out.println(request);
         InputStream input = request.getContent();
         HttpPost method = new HttpPost(
             session.getUser().getPartner().getBank().getURL().toString());
@@ -117,10 +118,11 @@ public class HttpRequestSender {
         try (CloseableHttpResponse response = httpClient.execute(method)) {
             this.response = new ByteArrayContentFactory(
                 EntityUtils.toByteArray(response.getEntity()));
-                System.out.println("Response:");
-                System.out.println(response);
-                System.out.println("Response Body:");
-                System.out.println(this.response);
+                // DEBUG LOGS:
+                // System.out.println("Response:");
+                // System.out.println(response);
+                // System.out.println("Response Body:");
+                // System.out.println(this.response);
             return response.getStatusLine().getStatusCode();
         }
     }
