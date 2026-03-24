@@ -70,6 +70,10 @@ import org.slf4j.LoggerFactory;
  */
 public class EbicsClient {
     private static File getRootDir() {
+        String override = System.getProperty("ebics.root.dir");
+        if (override != null && !override.isEmpty()) {
+            return new File(override);
+        }
         return new File(System.getProperty("user.home"), "ebics" + File.separator + "client");
     }
 
